@@ -1,0 +1,42 @@
+## US 00001: Optimizar roles e inicio de sesión
+
+### Historia
+Como administrador de un restaurante, quiero asignar roles y credenciales a los miembros de mi equipo y controlar qué operaciones puede realizar cada rol, para que cada persona use únicamente las funciones que necesita.
+
+Como miembro del equipo, quiero iniciar sesión indicando el código de mi restaurante, mi usuario y contraseña, para acceder a la información y las funciones autorizadas para mi rol.
+
+### Roles y permisos
+- **Dueño y gerente:** tienen los mismos permisos administrativos; pueden consultar la información, crear pedidos y administrar usuarios.
+- **Mesero:** puede crear, consultar, editar y eliminar pedidos de su restaurante y sucursal asignada.
+- **Cocinero:** tiene acceso de solo lectura a los pedidos y sus detalles; no puede crear pedidos ni cambiar estados de preparación.
+- **Cajero:** puede consultar cuentas abiertas y cobrarlas; no puede crear, editar ni eliminar pedidos.
+- Cada usuario tiene un solo rol y pertenece a un restaurante; cuando corresponda, también queda asignado a una sucursal.
+- Los empleados usan nombre de usuario y contraseña; no necesitan registrar correo.
+- El username es único, sin distinguir mayúsculas/minúsculas, dentro del restaurante.
+- El dueño nuevo recibe el username `dueno`; el dueño existente recibe `usuario-<id>`. Ambos pueden iniciar sesión con username o correo.
+- El código del restaurante es único y se muestra al dueño.
+- Los empleados existentes reciben un username `usuario-<id>` al migrar; sus contraseñas no cambian.
+- Los permisos se validan en el servidor además de ocultar o deshabilitar las acciones no permitidas en la interfaz.
+- Ningún usuario puede consultar o modificar información de otro restaurante.
+
+### Criterios de aceptación
+1. En el inicio de sesión se solicitan código del restaurante, usuario o correo y contraseña.
+2. Con credenciales válidas, el usuario entra al restaurante correspondiente y solo ve las secciones y acciones permitidas por su rol.
+3. Con credenciales inválidas, se muestra un mensaje claro sin revelar si falló el usuario, el restaurante o la contraseña.
+4. Un usuario sin sesión no puede acceder a las pantallas ni a los endpoints protegidos.
+5. Si un usuario intenta realizar una operación no permitida, el servidor la rechaza y no modifica los datos.
+6. El dueño o gerente puede listar y crear usuarios de su restaurante asignándoles nombre, username, contraseña inicial, rol y sucursal cuando aplique; los empleados no requieren correo y no se puede crear otro dueño.
+7. El mesero puede crear, consultar, editar y eliminar pedidos de su sucursal mientras ningún platillo haya comenzado a prepararse y el pedido no se haya cobrado.
+8. El cocinero puede consultar pedidos y detalles, pero no cambiar su contenido ni su estado de preparación.
+9. El cajero puede consultar y cobrar cuentas abiertas, sin crear, editar ni eliminar pedidos.
+10. Un usuario no puede ver o modificar usuarios, pedidos ni datos de otro restaurante o sucursal mediante la interfaz ni mediante llamadas directas a la API.
+11. Las contraseñas se almacenan de forma segura, nunca en texto plano, y no se muestran después de crear la cuenta.
+
+### Fuera de alcance por ahora
+- Recuperación de contraseña por correo.
+- Invitaciones por correo o verificación de correo.
+- Auditoría de cambios de permisos y pedidos.
+
+### Preguntas por definir
+- ¿Se agregarán edición, desactivación o restablecimiento de contraseña para usuarios existentes en una historia posterior?
+- ¿Se habilitará recuperación de contraseña o verificación de correo?

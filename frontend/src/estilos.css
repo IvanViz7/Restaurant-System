@@ -1,0 +1,52 @@
+:root { --fondo:#f4f5f2; --tinta:#17201e; --verde:#0f4c43; --azafran:#e0a100; --linea:#d9dcd6; --rojo:#b3261e; --blanco:#fff; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--fondo); color:var(--tinta); font:16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.app { max-width:760px; margin:0 auto; padding-bottom:76px; }
+header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:var(--verde); color:#fff; position:sticky; top:0; z-index:2; }
+header .texto { color:#fff; }
+.cabecera-identidad { display:flex; flex-direction:column; min-width:0; }
+.cabecera-identidad small { color:#e4efec; overflow-wrap:anywhere; }
+main { padding:8px 16px; }
+section { margin:18px 0; }
+h1 { font-size:1.6rem; } h2 { font-size:1.25rem; margin:0 0 10px; } h3 { font-size:1rem; margin:14px 0 6px; color:#4a5a56; }
+input, select { width:100%; padding:11px 12px; margin:4px 0; border:1px solid var(--linea); border-radius:8px; font:inherit; background:var(--blanco); }
+button { font:inherit; padding:10px 14px; margin:4px 0; border:1px solid var(--linea); border-radius:8px; background:var(--blanco); color:var(--tinta); cursor:pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid var(--azafran); outline-offset:1px; }
+button.primario { background:var(--verde); color:#fff; border-color:var(--verde); width:100%; }
+button.texto { background:none; border:none; text-decoration:underline; }
+button:disabled { opacity:.5; }
+.acceso { max-width:380px; margin:8vh auto; padding:0 20px; }
+.usuario-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.usuario-form label { font-size:.9rem; }
+.usuario-form .error, .usuario-form .correcto, .usuario-form button { grid-column:1/-1; }
+.correcto { color:var(--verde); }
+.barra-op { display:flex; gap:8px; } .barra-op > * { flex:1; min-width:0; }
+.kpis { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:12px 0; }
+.kpi { background:var(--blanco); border:1px solid var(--linea); border-radius:8px; padding:10px 12px; }
+.kpi small { display:block; color:#5d6b67; } .kpi b { font-size:1.3rem; }
+ul { list-style:none; padding:0; margin:0; } li { margin:10px 0; }
+.fila { display:flex; justify-content:space-between; gap:8px; }
+.barra { height:8px; background:#e5e8e2; border-radius:4px; margin:4px 0; overflow:hidden; } .barra i { display:block; height:100%; background:var(--verde); }
+small { color:#5d6b67; } .bloque { display:block; }
+.tarjeta { background:var(--blanco); border:1px solid var(--linea); border-radius:8px; padding:12px; margin:8px 0; display:flex; flex-direction:column; gap:2px; }
+.tarjeta.alerta { border-left:5px solid var(--rojo); } .tarjeta.preparando { border-left:5px solid var(--azafran); }
+.pago { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:8px; }
+.pago label { font-size:.9rem; }
+.pago .error, .pago-acciones { grid-column:1/-1; }
+.pago-acciones { display:flex; gap:8px; }
+.pago-acciones button { flex:1; }
+.pago-acciones button.primario { width:auto; }
+.cocina { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px; }
+.botones { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:6px; margin:8px 0; }
+.botones button { display:flex; flex-direction:column; align-items:flex-start; }
+.linea { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:4px 8px; align-items:center; margin:8px 0; }
+.linea-nombre { min-width:0; overflow-wrap:anywhere; }
+.linea input { grid-column:1/-1; }
+.linea button.boton-eliminar { display:grid; place-items:center; width:40px; height:40px; padding:0; margin:0; color:var(--rojo); }
+.vacio { color:#5d6b67; } .error { color:var(--rojo); }
+nav { position:fixed; bottom:0; left:0; right:0; display:flex; background:var(--blanco); border-top:1px solid var(--linea); overflow-x:auto; padding-bottom:env(safe-area-inset-bottom); }
+nav button { flex:1; border:none; border-radius:0; margin:0; padding:14px 10px; white-space:nowrap; }
+nav button.activo { color:var(--verde); font-weight:700; box-shadow:inset 0 3px 0 var(--azafran); }
+@media (prefers-reduced-motion: no-preference) { button { transition:background .15s; } }
+@media (max-width:420px) { .pago { grid-template-columns:1fr; } }
+@media (max-width:520px) { .usuario-form { grid-template-columns:1fr; } }
