@@ -1,43 +1,53 @@
-# Reglas base del proyecto
+---
+description: "Reglas generales del sistema Restaurante. Usa estas reglas junto con el contexto del proyecto y las reglas específicas del área."
+alwaysApply: true
+---
 
-Aplican a todos los cambios. Si una regla específica del área es más estricta, prevalece esa regla.
+# Reglas generales del proyecto
 
-## Convenciones de naming
+## Contexto y fuentes de verdad
 
-- Mantén los nombres del dominio en español, como en el código existente (`Pedido`, `Sucursal`, `sucursal_id` y `/pedidos`).
-- Python: módulos y funciones en `snake_case`; clases en `PascalCase`; constantes globales en `MAYUSCULAS_CON_GUIONES`.
-- SQLAlchemy: modelos en `PascalCase`, tablas en plural `snake_case` y columnas en `snake_case`.
-- React/JavaScript: componentes en `PascalCase`; funciones, variables y hooks en `camelCase`; constantes compartidas en `MAYUSCULAS_CON_GUIONES`.
-- CSS: usa clases descriptivas en minúsculas con guiones, siguiendo nombres como `.usuario-form` y `.barra-op`.
-- Conserva los nombres de rutas, campos JSON y roles que ya consume el frontend. Si cambia un contrato, actualiza ambos lados y la documentación funcional.
+- Antes de cualquier tarea, lee `aispecs/AGENTS.md` y sigue sus indicaciones.
+- Consulta [project-context.md](./project-context.md) para el resumen actual de arquitectura, rutas y comandos.
+- Stack confirmado: FastAPI y Python 3.12; React 18, Vite 5 y JavaScript; PostgreSQL 16; SQLAlchemy 2 y psycopg 3; Docker Compose y Caddy.
+- El código y la configuración vigentes son la fuente de verdad para detalles de implementación. No copies como hechos del proyecto ejemplos de otros repositorios.
+- Las reglas específicas por área complementan estas reglas. Si hay una discrepancia, no inventes un comportamiento: verifica el código y actualiza la documentación relevante.
 
-## Patrones del proyecto
+## Principios de trabajo
 
-- Backend: expón la API con FastAPI en `backend/app/main.py`; define entradas con modelos Pydantic y usa dependencias compartidas para autenticación, permisos y sesión de base de datos.
-- Persistencia: declara modelos y tipos reutilizables en `backend/app/modelos.py`. Usa SQLAlchemy 2 y consultas parametrizadas; no construyas SQL con datos de entrada.
-- Frontend: mantén la interfaz en React y centraliza las llamadas HTTP, la sesión y el manejo de errores en `frontend/src/api.js`.
-- Mantén la solución dentro del stack actual (FastAPI, SQLAlchemy, PostgreSQL, React y Vite). No agregues dependencias para resolver algo que el stack ya cubre.
-- Para errores de API, devuelve el estado y mensaje apropiados con `HTTPException`; en la interfaz, muestra el error recibido en vez de ocultarlo o convertirlo en éxito.
+- Lee el código y la documentación relacionada antes de modificar.
+- Haz cambios acotados al objetivo; no refactorices ni alteres datos ajenos a la tarea.
+- Sigue los patrones existentes y conserva los contratos API que consume el frontend.
+- Expón errores; no los conviertas en respuestas exitosas ni los ocultes con valores predeterminados.
+- Valida los cambios con el comando existente más pequeño que cubra el comportamiento afectado.
+- No versionar `.env`, credenciales, secretos ni contenido generado en `respaldos/`.
 
-## Reglas críticas
+## Convenciones de nombres
 
-### Seguridad, organización y sucursal
+| Ámbito | Convención | Ejemplo |
+|---|---|---|
+| Dominio y API | Español, conserva términos existentes | `Pedido`, `Sucursal`, `/pedidos` |
+| Python: módulos, funciones y variables | `snake_case` | `migraciones.py`, `sucursal_activa` |
+| Python: clases | `PascalCase` | `PedidoItem` |
+| Python: constantes | `UPPER_SNAKE_CASE` | `TABLAS_RLS` |
+| SQL: tablas y columnas | `snake_case`; tablas en plural | `pedido_items`, `organizacion_id` |
+| React: componentes | `PascalCase` | `Dashboard` |
+| JavaScript: funciones, variables y hooks | `camelCase` | `guardarSesion` |
+| CSS | Minúsculas con guiones | `.usuario-form` |
 
-- El backend es la autoridad para autenticar y autorizar. Ocultar secciones o botones en React mejora la UX, pero nunca sustituye `Depends(solo(...))` ni las comprobaciones del servidor.
-- Toda consulta o escritura operativa debe quedar limitada a la organización autenticada. Conserva `organizacion_id`, el contexto `app.org_id` de la sesión y las políticas RLS; no conectes la aplicación como superusuario ni desactives RLS para resolver un flujo.
-- Respeta el aislamiento de sucursal: dueño y gerente pueden elegirla donde corresponde; mesero, cocinero y cajero operan únicamente en la sucursal asignada. Valida en el backend la pertenencia de mesas, pedidos e identificadores recibidos.
-- Mantén las contraseñas con hash y verifica el JWT en el servidor. No registres ni incluyas contraseñas, tokens, secretos o credenciales en código, documentación, logs o pruebas.
+## Reglas críticas compartidas
 
-### Datos, dinero e inventario
+- El backend es la autoridad para autenticar, autorizar y validar recursos. La navegación del frontend no es un control de seguridad.
+- Toda operación debe respetar el aislamiento por organización y, cuando aplique, por sucursal. Preserva las políticas RLS y el rol de aplicación `app`.
+- Conserva los roles existentes (`dueno`, `gerente`, `mesero`, `cocinero`, `cajero`) y sus permisos del servidor.
+- Conserva el precio y costo históricos de los pedidos y la consistencia transaccional entre pedidos e inventario.
+- Los cambios de esquema requieren una nueva migración versionada; no edites migraciones aplicadas ni uses `create_all()` como sustituto.
+- No registres ni documentes contraseñas, tokens, secretos ni credenciales.
+- Al cambiar rutas, permisos, contratos, roles o flujos, actualiza ambos lados de la API y su documentación funcional.
 
-- Todo cambio de esquema existente requiere una nueva versión en `backend/app/migraciones.py`, idempotente y compatible con los datos actuales. `Base.metadata.create_all()` no sustituye una migración.
-- Conserva precisión monetaria y de cantidades con `Decimal` y los tipos `Numeric` del modelo; evita cálculos persistentes con `float`.
-- Los ítems de pedido deben conservar el precio y costo unitarios históricos. No recalcules ventas pasadas desde los precios o costos actuales del menú o de los insumos.
-- El consumo de recetas y el inventario deben cambiar en la misma transacción que el pedido. Al editar o eliminar un pedido, restaura el consumo registrado antes de volver a aplicarlo o borrar sus ítems; nunca ajustes stock de forma parcial.
-- No permitas editar ni eliminar pedidos cobrados o cuya preparación haya comenzado. Conserva también la validación del servidor aunque la interfaz oculte esas acciones.
+## Reglas por área
 
-### Cambios funcionales
-
-- Conserva los roles existentes (`dueno`, `gerente`, `mesero`, `cocinero`, `cajero`) y aplica permisos por operación; el cocinero es de solo lectura y el cajero consulta y cobra, sin crear ni modificar pedidos.
-- Al cambiar contratos, permisos, flujos, roles o comportamiento de pedidos/inventario, actualiza la documentación relevante y verifica los casos afectados.
-- No sobrescribas datos de usuarios ni respaldos como parte de una tarea rutinaria. No versionar secretos, `.env` ni el contenido generado en `respaldos/`.
+- [backend-standards.md](./backend-standards.md): API, autenticación, sesiones, transacciones y backend.
+- [database-standards.md](./database-standards.md): modelos, PostgreSQL, RLS, precisión y migraciones.
+- [frontend-standards.md](./frontend-standards.md): React, Vite, API, sesión y estilos.
+- [sync-pipeline-standards.md](./sync-pipeline-standards.md): alcance de los procesos de migración, respaldo y cualquier futura sincronización.
